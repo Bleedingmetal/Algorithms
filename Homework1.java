@@ -152,7 +152,7 @@ public class Homework1 {
     public void cpuMove(boolean firstMove) {
         System.out.println("CPU is calculating...\n");
         try {
-            TimeUnit.SECONDS.sleep(2);  // making it seem like the cpu is " The thinker" - flash reference
+            TimeUnit.SECONDS.sleep(2);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -160,20 +160,7 @@ public class Homework1 {
         String color = "";
         int count = 0;
 
-
-        for (String c : new String[]{"green", "yellow", "orange"}) {
-            for (int i = 1; i <= Math.min(2, getMarkerCount(c)); i++) {
-                if (isValidMove(c, i) && canWinAfterMove(c, i)) {
-                    color = c;
-                    count = i;
-                    break;
-                }
-            }
-            if (!color.isEmpty()) break;
-        }
-
-
-        if (color.isEmpty()) {
+        if (firstMove) {
             Random random = new Random();
             do {
                 int colorChoice = random.nextInt(3);
@@ -184,15 +171,42 @@ public class Homework1 {
                     default: color = "orange"; break;
                 }
             } while (!isValidMove(color, count));
+        } else {
+            boolean winningMoveFound = false;
+            for (String c : new String[]{"green", "yellow", "orange"}) {
+                for (int i = 1; i <= 2; i++) {
+                    if (isValidMove(c, i) && canWinAfterMove(c, i)) {
+                        color = c;
+                        count = i;
+                        winningMoveFound = true;
+                        break;
+                    }
+                }
+                if (winningMoveFound) break;
+            }
+
+            if (!winningMoveFound) {
+                Random random = new Random();
+                do {
+                    int colorChoice = random.nextInt(3);
+                    count = random.nextInt(1, 3);
+                    switch (colorChoice) {
+                        case 0: color = "green"; break;
+                        case 1: color = "yellow"; break;
+                        default: color = "orange"; break;
+                    }
+                } while (!isValidMove(color, count));
+            }
         }
 
         System.out.println("CPU removes " + count + " " + color + " marker(s).");
 
-        if (canWinAfterMove(color, count) && (greenMarkers + yellowMarkers + orangeMarkers) == 1) {
+        // If only one marker remains after the CPU's move, it means the player is about to lose
+        if (canWinAfterMove(color, count) && (greenMarkers + yellowMarkers + orangeMarkers - count) == 1) {
             System.out.println("CPU: You're about to lose! Haha ");
         }
 
-        removeMarkers(color, count);
+        removeMarkers(color, count); //manoh\j
     }
 
 
@@ -241,7 +255,7 @@ public class Homework1 {
     }
 
     public void cpuWinMessage() {
-        System.out.println("CPU: You think you can beat me? *Starts Hitting the Girddy*");
+        System.out.println("CPU: You think you can beat me? *Starts Hitting the Girddy*\n");
     }
 
     public void cpuLossMessage() {
