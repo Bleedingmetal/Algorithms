@@ -122,64 +122,6 @@ public class Homework1 {
         }
     }
 
-    public void cpuMove(boolean firstMove) {
-        System.out.println("CPU is calculating...\n");
-        try {
-            TimeUnit.SECONDS.sleep(2);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-
-        String color = "";
-        int count = 0;
-
-        if (firstMove) {
-            Random random = new Random();
-            do {
-                int colorChoice = random.nextInt(3);
-                count = random.nextInt(1, 3);
-                switch (colorChoice) {
-                    case 0: color = "green"; break;
-                    case 1: color = "yellow"; break;
-                    default: color = "orange"; break;
-                }
-            } while (!isValidMove(color, count));
-            System.out.println("CPU removes " + count + " " + color + " marker(s).");
-        } else {
-            for (String c : new String[]{"green", "yellow", "orange"}) {
-                for (int i = 1; i <= 2; i++) {
-                    if (isValidMove(c, i) && canWinAfterMove(c, i)) {
-                        color = c;
-                        count = i;
-                        break;
-                    }
-                }
-                if (!color.isEmpty()) break;
-            }
-
-            if (color.isEmpty()) {
-                Random random = new Random();
-                do {
-                    int colorChoice = random.nextInt(3);
-                    count = random.nextInt(1, 3);
-                    switch (colorChoice) {
-                        case 0: color = "green"; break;
-                        case 1: color = "yellow"; break;
-                        default: color = "orange"; break;
-                    }
-                } while (!isValidMove(color, count));
-            }
-
-            System.out.println("CPU removes " + count + " " + color + " marker(s).");
-        }
-
-        if (canWinAfterMove(color, count) && (greenMarkers + yellowMarkers + orangeMarkers) == 1) {
-            System.out.println("CPU:You're about to lose! Haha ");
-        }
-
-        removeMarkers(color, count);
-    }
-
     public boolean isValidMove(String color, int count) {
         switch (color.toLowerCase()) {
             case "green":
@@ -207,6 +149,69 @@ public class Homework1 {
         }
     }
 
+    public void cpuMove(boolean firstMove) {
+        System.out.println("CPU is calculating...\n");
+        try {
+            TimeUnit.SECONDS.sleep(2);  // making it seem like the cpu is " The thinker" - flash reference
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        String color = "";
+        int count = 0;
+
+
+        for (String c : new String[]{"green", "yellow", "orange"}) {
+            for (int i = 1; i <= Math.min(2, getMarkerCount(c)); i++) {
+                if (isValidMove(c, i) && canWinAfterMove(c, i)) {
+                    color = c;
+                    count = i;
+                    break;
+                }
+            }
+            if (!color.isEmpty()) break;
+        }
+
+
+        if (color.isEmpty()) {
+            Random random = new Random();
+            do {
+                int colorChoice = random.nextInt(3);
+                count = random.nextInt(1, 3);
+                switch (colorChoice) {
+                    case 0: color = "green"; break;
+                    case 1: color = "yellow"; break;
+                    default: color = "orange"; break;
+                }
+            } while (!isValidMove(color, count));
+        }
+
+        System.out.println("CPU removes " + count + " " + color + " marker(s).");
+
+        if (canWinAfterMove(color, count) && (greenMarkers + yellowMarkers + orangeMarkers) == 1) {
+            System.out.println("CPU: You're about to lose! Haha ");
+        }
+
+        removeMarkers(color, count);
+    }
+
+
+
+
+    public int getMarkerCount(String color) {
+        switch (color.toLowerCase()) {
+            case "green":
+                return greenMarkers;
+            case "yellow":
+                return yellowMarkers;
+            case "orange":
+                return orangeMarkers;
+            default:
+                return 0;
+        }
+    }
+
+
     public boolean canWinAfterMove(String color, int count) {
         int tempGreen = greenMarkers;
         int tempYellow = yellowMarkers;
@@ -224,8 +229,10 @@ public class Homework1 {
                 break;
         }
 
-        return (tempGreen + tempYellow + tempOrange) > 0;
+        int nimSum = tempGreen ^ tempYellow ^ tempOrange;
+        return nimSum == 0;
     }
+
 
     public void resetMarkers() {
         greenMarkers = 3;
