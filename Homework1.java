@@ -15,7 +15,7 @@ public class Homework1 {
 
     public void startGame() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Welcome to Double Trouble with an aditya twist(it basically trash talks)!");
+        System.out.println("Welcome to Double Trouble with an Aditya twist (it basically trash talks)!");
         System.out.println("Choose the order of play:\n1. You go first\n2. CPU goes first\n3. Tournament mode (2n + 1)");
 
         while (true) {
@@ -36,25 +36,71 @@ public class Homework1 {
         scanner.close();
     }
 
+    public void tournamentMode(Scanner scanner) {
+        System.out.print("Enter number of rounds (n): ");
+        int n = scanner.nextInt();
+        int maxGames = 2 * n + 1;
+        int playerWins = 0;
+        int cpuWins = 0;
+        Random random = new Random();
+
+        for (int gameNumber = 1; gameNumber <= maxGames && playerWins <= n && cpuWins <= n; gameNumber++) {
+            System.out.println("\nRound " + gameNumber + " start!");
+
+            // Randomly determine who starts
+            boolean isPlayerTurn = random.nextBoolean();
+            System.out.println((isPlayerTurn ? "Player" : "CPU") + " goes first.");
+            resetMarkers(); // Reset the markers for a new game
+
+            while (greenMarkers + yellowMarkers + orangeMarkers > 0) {
+                displayMarkers();
+                if (isPlayerTurn) {
+                    playerMove(scanner);
+                } else {
+                    cpuMove();
+                }
+
+                // Toggle turn after a move
+                isPlayerTurn = !isPlayerTurn;
+            }
+
+            // Determine round winner
+            if (!isPlayerTurn) {
+                playerWins++;
+                System.out.println("You win this round!");
+            } else {
+                cpuWins++;
+                System.out.println("CPU wins this round!\n");
+                cpuWinMessage();
+            }
+
+            System.out.println("Score: Player " + playerWins + " - CPU " + cpuWins);
+        }
+
+        // Display final tournament result
+        if (playerWins > cpuWins) {
+            System.out.println("\nCongratulations! You won the tournament with " + playerWins + " wins!");
+        } else {
+            System.out.println("\nThe CPU wins the tournament with " + cpuWins + " wins! Better luck next time.");
+        }
+    }
+
     public void playGame(Scanner scanner) {
         boolean isPlayerTurn = (order == 1);
-        boolean firstMove = true;
 
         while (greenMarkers + yellowMarkers + orangeMarkers > 0) {
             displayMarkers();
             if (isPlayerTurn) {
                 playerMove(scanner);
             } else {
-                cpuMove(firstMove);
-                firstMove = false;
+                cpuMove();
             }
 
             // Toggle turn after a move
             isPlayerTurn = !isPlayerTurn;
         }
 
-
-        if (!isPlayerTurn) {  // If the loop ended on the player's turn, they made the last move I was tweaking too much about this holy
+        if (!isPlayerTurn) {
             System.out.println("Game Over! You win!");
             cpuLossMessage();
         } else {
@@ -63,41 +109,16 @@ public class Homework1 {
         }
     }
 
-    public void tournamentMode(Scanner scanner) {
-        int playerWins = 0;
-        int cpuWins = 0;
-        while (playerWins < 3 && cpuWins < 3) {
-            resetMarkers();
-            playGame(scanner);
-            if (greenMarkers + yellowMarkers + orangeMarkers == 0) {
-                if (playerWins > cpuWins) {
-                    cpuWins++;
-                    System.out.println("CPU wins this round!");
-                    cpuWinMessage();
-                } else {
-                    playerWins++;
-                    System.out.println("You win this round!");
-                }
-            }
-        }
-        System.out.println("Tournament Over! Final Score: You: " + playerWins + " - CPU: " + cpuWins);
-    }
-
     public void displayMarkers() {
         System.out.println("\nCurrent Markers:");
         StringBuilder output = new StringBuilder();
 
-        // Add green markers
         for (int i = 0; i < greenMarkers; i++) {
             output.append(GREEN_COLOR).append("|").append(RESET_COLOR);
         }
-
-        // Add yellow markers
         for (int i = 0; i < yellowMarkers; i++) {
             output.append(YELLOW_COLOR).append("|").append(RESET_COLOR);
         }
-
-        // Add orange markers
         for (int i = 0; i < orangeMarkers; i++) {
             output.append(ORANGE_COLOR).append("|").append(RESET_COLOR);
         }
@@ -110,7 +131,7 @@ public class Homework1 {
         int count;
 
         while (true) {
-            System.out.print("Your turn! Choose color (green, yellow, orange) and count: \n ");
+            System.out.print("Your turn! Choose color (green, yellow, orange) and count: ");
             color = scanner.next();
             count = scanner.nextInt();
             if (isValidMove(color, count)) {
@@ -149,18 +170,36 @@ public class Homework1 {
         }
     }
 
-    public void cpuMove(boolean firstMove) {
+    public void cpuMove() {
         System.out.println("CPU is calculating...\n");
         try {
-            TimeUnit.SECONDS.sleep(2);
+            TimeUnit.SECONDS.sleep(2); // Simulate CPU thinking time
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
 
         String color = "";
         int count = 0;
+        boolean winningMoveFound = false;
 
-        if (firstMove) {
+        // Check if a winning move is possible
+        for (String c : new String[]{"green", "yellow", "orange"}) {
+            for (int i = 1; i <= getMarkerCount(c); i++) {
+                if (isValidMove(c, i) && canWinAfterMove(c, i)) {
+                    color = c;
+                    count = i;
+
+
+
+                    winningMoveFound = true;
+                    break;
+                }
+            }
+            if (winningMoveFound) break;
+        }
+
+        if (!winningMoveFound) {
+            // No winning move: pick a random move if no winning move is available
             Random random = new Random();
             do {
                 int colorChoice = random.nextInt(3);
@@ -171,46 +210,33 @@ public class Homework1 {
                     default: color = "orange"; break;
                 }
             } while (!isValidMove(color, count));
-        } else {
-            boolean winningMoveFound = false;
-            for (String c : new String[]{"green", "yellow", "orange"}) {
-                for (int i = 1; i <= 2; i++) {
-                    if (isValidMove(c, i) && canWinAfterMove(c, i)) {
-                        color = c;
-                        count = i;
-                        winningMoveFound = true;
-                        break;
-                    }
-                }
-                if (winningMoveFound) break;
-            }
-
-            if (!winningMoveFound) {
-                Random random = new Random();
-                do {
-                    int colorChoice = random.nextInt(3);
-                    count = random.nextInt(1, 3);
-                    switch (colorChoice) {
-                        case 0: color = "green"; break;
-                        case 1: color = "yellow"; break;
-                        default: color = "orange"; break;
-                    }
-                } while (!isValidMove(color, count));
-            }
         }
 
-        System.out.println("CPU removes " + count + " " + color + " marker(s).");
-
-        // If only one marker remains after the CPU's move, it means the player is about to lose
-        if (canWinAfterMove(color, count) && (greenMarkers + yellowMarkers + orangeMarkers - count) == 1) {
-            System.out.println("CPU: You're about to lose! Haha ");
-        }
-
-        removeMarkers(color, count); //manoh\j
+        System.out.println("CPU removes " + count + " " + color + " marker(s).\n");
+        removeMarkers(color, count);
     }
 
+    // Helper function to check if the move results in an immediate win
+    public boolean willWinAfterThisMove(String color, int count) {
+        int tempGreen = greenMarkers;
+        int tempYellow = yellowMarkers;
+        int tempOrange = orangeMarkers;
 
+        switch (color.toLowerCase()) {
+            case "green":
+                tempGreen -= count;
+                break;
+            case "yellow":
+                tempYellow -= count;
+                break;
+            case "orange":
+                tempOrange -= count;
+                break;
+        }
 
+        // Check if all markers are removed
+        return tempGreen + tempYellow + tempOrange == 0;
+    }
 
     public int getMarkerCount(String color) {
         switch (color.toLowerCase()) {
@@ -224,7 +250,6 @@ public class Homework1 {
                 return 0;
         }
     }
-
 
     public boolean canWinAfterMove(String color, int count) {
         int tempGreen = greenMarkers;
@@ -247,7 +272,6 @@ public class Homework1 {
         return nimSum == 0;
     }
 
-
     public void resetMarkers() {
         greenMarkers = 3;
         yellowMarkers = 7;
@@ -255,7 +279,7 @@ public class Homework1 {
     }
 
     public void cpuWinMessage() {
-        System.out.println("CPU: You think you can beat me? *Starts Hitting the Girddy*\n");
+        System.out.println("CPU: You think you can beat me? *Starts Hitting the Gritty*\n");
     }
 
     public void cpuLossMessage() {
