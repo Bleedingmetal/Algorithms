@@ -49,23 +49,20 @@ public class Homework1 {
                 firstMove = false;
             }
 
-
-            if (greenMarkers + yellowMarkers + orangeMarkers == 0) {
-                break;
-            }
-
+            // Toggle turn after a move
             isPlayerTurn = !isPlayerTurn;
         }
 
-        // Determine the winner based on the last move
-        if (isPlayerTurn) {
-            System.out.println("Game Over! CPU wins!");
-            cpuWinMessage();
-        } else {
+
+        if (!isPlayerTurn) {  // If the loop ended on the player's turn, they made the last move I was tweaking too much about this holy
             System.out.println("Game Over! You win!");
             cpuLossMessage();
+        } else {
+            System.out.println("Game Over! CPU wins!");
+            cpuWinMessage();
         }
     }
+
     public void tournamentMode(Scanner scanner) {
         int playerWins = 0;
         int cpuWins = 0;
