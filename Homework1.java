@@ -173,7 +173,7 @@ public class Homework1 {
     public void cpuMove() {
         System.out.println("CPU is calculating...\n");
         try {
-            TimeUnit.SECONDS.sleep(2); // Simulate CPU thinking time
+            TimeUnit.SECONDS.sleep(2); // Lie to the audience as if the CPU is actually thinking
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -182,7 +182,7 @@ public class Homework1 {
         int count = 0;
         boolean winningMoveFound = false;
 
-        // Check if a winning move is possible
+        // Check if a winning move is possible if not just skip to random and do that
         for (String c : new String[]{"green", "yellow", "orange"}) {
             for (int i = 1; i <= getMarkerCount(c); i++) {
                 if (isValidMove(c, i) && canWinAfterMove(c, i)) {
@@ -216,7 +216,7 @@ public class Homework1 {
         removeMarkers(color, count);
     }
 
-    // Helper function to check if the move results in an immediate win
+
     public boolean willWinAfterThisMove(String color, int count) {
         int tempGreen = greenMarkers;
         int tempYellow = yellowMarkers;
@@ -234,7 +234,7 @@ public class Homework1 {
                 break;
         }
 
-        // Check if all markers are removed
+        // Check if all markers are removed coz otherwise looks stupid.
         return tempGreen + tempYellow + tempOrange == 0;
     }
 
