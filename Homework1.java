@@ -48,18 +48,24 @@ public class Homework1 {
                 cpuMove(firstMove);
                 firstMove = false;
             }
+
+
+            if (greenMarkers + yellowMarkers + orangeMarkers == 0) {
+                break;
+            }
+
             isPlayerTurn = !isPlayerTurn;
         }
 
+        // Determine the winner based on the last move
         if (isPlayerTurn) {
-            System.out.println("Game Over! You win!");
-            cpuLossMessage();
-        } else {
             System.out.println("Game Over! CPU wins!");
             cpuWinMessage();
+        } else {
+            System.out.println("Game Over! You win!");
+            cpuLossMessage();
         }
     }
-
     public void tournamentMode(Scanner scanner) {
         int playerWins = 0;
         int cpuWins = 0;
