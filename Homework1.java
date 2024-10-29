@@ -79,7 +79,7 @@ public class Homework1 {
 
         // Display final tournament result
         if (playerWins > cpuWins) {
-            System.out.println("\nCongratulations! You won the tournament with " + playerWins + " wins!");
+            System.out.println("\nCongratulations! You won the tournament with " + playerWins + " wins you're the goat (I know this took 100 tries(too lazy to do the math))!");
         } else {
             System.out.println("\nThe CPU wins the tournament with " + cpuWins + " wins! Better luck next time.");
         }
