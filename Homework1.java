@@ -1,3 +1,4 @@
+import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -19,11 +20,16 @@ public class Homework1 {
         System.out.println("Choose the order of play:\n1. You go first\n2. CPU goes first\n3. Tournament mode (2n + 1)");
 
         while (true) {
-            order = scanner.nextInt();
-            if (order == 1 || order == 2 || order == 3) {
-                break;
-            } else {
-                System.out.println("Invalid choice. Please choose 1, 2, or 3.");
+            try {
+                order = scanner.nextInt();
+                if (order == 1 || order == 2 || order == 3) {
+                    break;
+                } else {
+                    System.out.println("Invalid choice. Please choose 1, 2, or 3.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a number (1, 2, or 3).");
+                scanner.next(); // Clear invalid input
             }
         }
 
@@ -37,8 +43,19 @@ public class Homework1 {
     }
 
     public void tournamentMode(Scanner scanner) {
-        System.out.print("Enter number of rounds (n): ");
-        int n = scanner.nextInt();
+        int n = 0;
+        while (true) {
+            try {
+                System.out.print("Enter number of rounds (n): ");
+                n = scanner.nextInt();
+                if (n > 0) break;
+                else System.out.println("Please enter a positive integer.");
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a valid integer.");
+                scanner.next(); // Clear invalid input
+            }
+        }
+
         int maxGames = 2 * n + 1;
         int playerWins = 0;
         int cpuWins = 0;
@@ -131,14 +148,19 @@ public class Homework1 {
         int count;
 
         while (true) {
-            System.out.print("Your turn! Choose color (green, yellow, orange) and count: ");
-            color = scanner.next();
-            count = scanner.nextInt();
-            if (isValidMove(color, count)) {
-                removeMarkers(color, count);
-                break;
-            } else {
-                System.out.println("Invalid move. Please try again.");
+            try {
+                System.out.print("Your turn! Choose color (green, yellow, orange) and count: ");
+                color = scanner.next();
+                count = scanner.nextInt();
+                if (isValidMove(color, count)) {
+                    removeMarkers(color, count);
+                    break;
+                } else {
+                    System.out.println("Invalid move. Please try again.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a valid color and integer count.");
+                scanner.next(); // Clear invalid input
             }
         }
     }
@@ -182,15 +204,11 @@ public class Homework1 {
         int count = 0;
         boolean winningMoveFound = false;
 
-        // Check if a winning move is possible if not just skip to random and do that
         for (String c : new String[]{"green", "yellow", "orange"}) {
             for (int i = 1; i <= getMarkerCount(c); i++) {
                 if (isValidMove(c, i) && canWinAfterMove(c, i)) {
                     color = c;
                     count = i;
-
-
-
                     winningMoveFound = true;
                     break;
                 }
@@ -199,7 +217,6 @@ public class Homework1 {
         }
 
         if (!winningMoveFound) {
-            // No winning move: pick a random move if no winning move is available
             Random random = new Random();
             do {
                 int colorChoice = random.nextInt(3);
@@ -215,7 +232,6 @@ public class Homework1 {
         System.out.println("CPU removes " + count + " " + color + " marker(s).\n");
         removeMarkers(color, count);
     }
-
 
     public boolean willWinAfterThisMove(String color, int count) {
         int tempGreen = greenMarkers;
@@ -234,7 +250,6 @@ public class Homework1 {
                 break;
         }
 
-        // Check if all markers are removed coz otherwise looks stupid.
         return tempGreen + tempYellow + tempOrange == 0;
     }
 
