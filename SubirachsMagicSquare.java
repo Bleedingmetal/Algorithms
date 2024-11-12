@@ -1,80 +1,85 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SubirachsMagicSquare {
-    private static final int[][] magicSquare = {
-            {4, 9, 2},
-            {3, 5, 7},
-            {8, 1, 6}
+    private static final int[][] square = {
+            {1, 14, 14, 4},
+            {11, 7, 6, 9},
+            {8, 10, 10, 5},
+            {13, 2, 3, 15}
     };
+    private static final int TARGET_SUM = 33;
 
     public static void main(String[] args) {
-        int targetSum = 15;
-        int count4ElementCombinations = countCombinations(4, targetSum);
-        System.out.println("Count of 4-element combinations with sum " + targetSum + ": " + count4ElementCombinations);
+        List<Integer> allElements = new ArrayList<>();
+        for (int[] row : square) {
+            for (int val : row) {
+                allElements.add(val);
+            }
+        }
 
-        int countAllCombinations = countAllCombinations(targetSum);
-        System.out.println("Count of all combinations with sum " + targetSum + ": " + countAllCombinations);
+        int fourElementCombos = countFourElementCombinations(allElements, TARGET_SUM);
+        int allCombos = countAllCombinations(allElements, TARGET_SUM);
+        Map<Integer, Integer> sumCounts = countAllPossibleSums(allElements);
 
-        HashMap<Integer, Integer> sumOccurrences = countAllPossibleSums();
+        System.out.println("Number of 4-element combinations with sum 33: " + fourElementCombos);
+        System.out.println("Number of all combinations with sum 33: " + allCombos);
+
+        int maxCount = 0;
         int mostCommonSum = 0;
-        int mostCommonCount = 0;
-
-        for (var entry : sumOccurrences.entrySet()) {
-            if (entry.getValue() > mostCommonCount) {
-                mostCommonCount = entry.getValue();
+        for (Map.Entry<Integer, Integer> entry : sumCounts.entrySet()) {
+            if (entry.getValue() > maxCount) {
+                maxCount = entry.getValue();
                 mostCommonSum = entry.getKey();
             }
-            System.out.println("Sum " + entry.getKey() + " occurs " + entry.getValue() + " times.");
         }
-
-        System.out.println("Most common sum: " + mostCommonSum + " with " + mostCommonCount + " occurrences.");
+        System.out.println("Most common sum: " + mostCommonSum + " with " + maxCount + " combinations");
     }
 
-    public static int countCombinations(int numElements, int targetSum) {
-        ArrayList<Integer> elements = getElementsFromSquare();
-        return countCombinationsRecursive(elements, numElements, targetSum, 0);
+    private static int countFourElementCombinations(List<Integer> elements, int targetSum) {
+        return countCombinations(elements, 4, targetSum);
     }
 
-    private static int countCombinationsRecursive(ArrayList<Integer> elements, int numElements, int targetSum, int index) {
-        if (targetSum == 0 && numElements == 0) return 1;
-        if (targetSum < 0 || numElements == 0 || index >= elements.size()) return 0;
-        int countIncluding = countCombinationsRecursive(elements, numElements - 1, targetSum - elements.get(index), index + 1);
-        int countExcluding = countCombinationsRecursive(elements, numElements, targetSum, index + 1);
-        return countIncluding + countExcluding;
-    }
-
-    public static int countAllCombinations(int targetSum) {
-        ArrayList<Integer> elements = getElementsFromSquare();
-        return countAllCombinationsRecursive(elements, targetSum, 0);
-    }
-
-    private static int countAllCombinationsRecursive(ArrayList<Integer> elements, int targetSum, int index) {
-        if (targetSum == 0) return 1;
-        if (targetSum < 0 || index >= elements.size()) return 0;
-        int countIncluding = countAllCombinationsRecursive(elements, targetSum - elements.get(index), index + 1);
-        int countExcluding = countAllCombinationsRecursive(elements, targetSum, index + 1);
-        return countIncluding + countExcluding;
-    }
-
-    public static HashMap<Integer, Integer> countAllPossibleSums() {
-        ArrayList<Integer> elements = getElementsFromSquare();
-        HashMap<Integer, Integer> sumOccurrences = new HashMap<>();
-        int maxSum = elements.stream().mapToInt(Integer::intValue).sum();
-        for (int targetSum = 0; targetSum <= maxSum; targetSum++) {
-            int count = countAllCombinations(targetSum);
-            sumOccurrences.put(targetSum, count);
+    private static int countAllCombinations(List<Integer> elements, int targetSum) {
+        int count = 0;
+        for (int size = 1; size <= elements.size(); size++) {
+            count += countCombinations(elements, size, targetSum);
         }
-        return sumOccurrences;
+        return count;
     }
 
-    private static ArrayList<Integer> getElementsFromSquare() {
-        ArrayList<Integer> elements = new ArrayList<>();
-        for (int[] row : magicSquare) {
-            for (int num : row) {
-                elements.add(num);
-            }
+    private static int countCombinations(List<Integer> elements, int size, int targetSum) {
+        return countCombinationsRecursive(elements, size, targetSum, 0, 0, 0);
+    }
+
+    private static int countCombinationsRecursive(List<Integer> elements, int size, int targetSum, int start, int depth, int currentSum) {
+        if (depth == size) {
+            return currentSum == targetSum ? 1 : 0;
         }
-        return elements;
+        int count = 0;
+        for (int i = start; i < elements.size(); i++) {
+            count += countCombinationsRecursive(elements, size, targetSum, i + 1, depth + 1, currentSum + elements.get(i));
+        }
+        return count;
+    }
+
+    private static Map<Integer, Integer> countAllPossibleSums(List<Integer> elements) {
+        Map<Integer, Integer> sumCounts = new HashMap<>();
+        for (int size = 1; size <= elements.size(); size++) {
+            countSumsRecursive(elements, size, 0, 0, 0, sumCounts);
+        }
+        return sumCounts;
+    }
+
+    private static void countSumsRecursive(List<Integer> elements, int size, int start, int depth, int currentSum, Map<Integer, Integer> sumCounts) {
+        if (depth == size) {
+            sumCounts.put(currentSum, sumCounts.getOrDefault(currentSum, 0) + 1);
+            return;
+        }
+        for (int i = start; i < elements.size(); i++) {
+            countSumsRecursive(elements, size, i + 1, depth + 1, currentSum + elements.get(i), sumCounts);
+        }
     }
 }
