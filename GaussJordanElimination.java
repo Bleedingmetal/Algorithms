@@ -71,6 +71,8 @@ public class GaussJordanElimination {
             if (Math.abs(sum - augmentedMatrix[i][augmentedMatrix[0].length - 1]) > 1e-6) {
                 return false;
 
+            }
+
         }
         return true;
     }
