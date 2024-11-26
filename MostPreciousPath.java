@@ -1,10 +1,9 @@
-import java.util.Arrays;
-
 public class MostPreciousPath {
-// give me the ring my precious - pls gimme bonus points for hobbit reference
+
+    // give me the ring my precious - pls gimme bonus points for hobbit reference
     // I have read the books bonus points for hobbit slide em over fr .
     public static void main(String[] args) {
-        int[][] gemstones = {
+        int[][] gems = {
                 {84, 99, 68, 75, 98, 44, 33, 96},
                 {93, 53, 24, 46, 86, 1, 41, 10},
                 {7, 30, 51, 65, 27, 94, 97, 83},
@@ -15,52 +14,58 @@ public class MostPreciousPath {
                 {21, 95, 20, 82, 66, 52, 89, 35}
         };
 
-        int rows = gemstones.length;
-        int cols = gemstones[0].length;
+        int rows = gems.length;
+        int cols = gems[0].length;
         int[][] dp = new int[rows][cols];
         int[][] path = new int[rows][cols];
 
-        for (int j = 0; j < cols; j++) {
-            dp[rows - 1][j] = gemstones[rows - 1][j];
+        for (int col = 0; col < cols; col++) {
+            dp[rows - 1][col] = gems[rows - 1][col];
         }
 
-        for (int i = rows - 2; i >= 0; i--) {
-            for (int j = 0; j < cols; j++) {
-                int maxGemstones = dp[i + 1][j];
-                path[i][j] = j;
+        for (int row = rows - 2; row >= 0; row--) {
+            for (int col = 0; col < cols; col++) {
+                int maxGems = dp[row + 1][col];
+                int move = col;
 
-                if (j > 0 && dp[i + 1][j - 1] > maxGemstones) {
-                    maxGemstones = dp[i + 1][j - 1];
-                    path[i][j] = j - 1;
+                if (col > 0 && dp[row + 1][col - 1] > maxGems) {
+                    maxGems = dp[row + 1][col - 1];
+                    move = col - 1;
                 }
 
-                if (j < cols - 1 && dp[i + 1][j + 1] > maxGemstones) {
-                    maxGemstones = dp[i + 1][j + 1];
-                    path[i][j] = j + 1;
+                if (col < cols - 1 && dp[row + 1][col + 1] > maxGems) {
+                    maxGems = dp[row + 1][col + 1];
+                    move = col + 1;
                 }
 
-                dp[i][j] = gemstones[i][j] + maxGemstones;
+                dp[row][col] = gems[row][col] + maxGems;
+                path[row][col] = move;
             }
         }
 
-        int maxGems = 0;
+        int maxGems = dp[0][0];
         int startCol = 0;
-        for (int j = 0; j < cols; j++) {
-            if (dp[0][j] > maxGems) {
-                maxGems = dp[0][j];
-                startCol = j;
+        for (int col = 1; col < cols; col++) {
+            if (dp[0][col] > maxGems) {
+                maxGems = dp[0][col];
+                startCol = col;
             }
         }
 
-        int[] pathTaken = new int[rows];
-        pathTaken[0] = startCol;
-        for (int i = 1; i < rows; i++) {
-            pathTaken[i] = path[i - 1][pathTaken[i - 1]];
+        int[] finalPath = new int[rows];
+        int col = startCol;
+        for (int row = 0; row < rows; row++) {
+            finalPath[row] = col;
+            col = path[row][col];
         }
 
-        System.out.println("Starting square: Column " + (startCol + 1));
-        System.out.println("Path taken: " + Arrays.toString(pathTaken));
+        System.out.println("Starting square row 1 obviously and (column): " + (startCol + 1));
+        System.out.print("Path: ");
+        for (int row = 0; row < rows; row++) {
+            System.out.print("(" + (row + 1) + "," + (finalPath[row] + 1) + ") ");
+        }
+        System.out.println();
         System.out.println("Total gemstones collected: " + maxGems);
-        System.out.println("Vault number: " + (pathTaken[rows - 1] + 1));
+        System.out.println("Vault containing the Arkenstone: " + (finalPath[rows - 1] + 1));
     }
 }
