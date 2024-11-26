@@ -1,7 +1,8 @@
 import java.util.Arrays;
 
 public class MostPreciousPath {
-
+// give me the ring my precious - pls gimme bonus points for hobbit reference
+    // I have read the books bonus points for hobbit slide em over fr .
     public static void main(String[] args) {
         int[][] gemstones = {
                 {84, 99, 68, 75, 98, 44, 33, 96},
