@@ -5,15 +5,19 @@ public class ClosedHashingGraded {
     private static final int C = 123;
 
     public static void main(String[] args) throws IOException {
-        Map<String, Integer> fileToTableSize = new HashMap<>();
-        fileToTableSize.put("TheRavenB24.txt", 1000);
-        fileToTableSize.put("TellTaleHeartB24.txt", 790);
-        fileToTableSize.put("TheCaskOfAmontilladoB24.txt", 991);
-        fileToTableSize.put("Heart prepended to Cask", 1499);
-        fileToTableSize.put("Cask prepended to Heart", 1499);
+        String[] fileNames = {
+                "TheRavenB24.txt",
+                "TellTaleHeartB24.txt",
+                "TheCaskOfAmontilladoB24.txt",
+                "Heart prepended to Cask",
+                "Cask prepended to Heart"
+        };
 
-        for (String fileName : fileToTableSize.keySet()) {
-            int tableSize = fileToTableSize.get(fileName);
+        int[] tableSizes = {1000, 790, 991, 1499, 1499};
+
+        for (int i = 0; i < fileNames.length; i++) {
+            String fileName = fileNames[i];
+            int tableSize = tableSizes[i];
             List<String> words;
 
             if (fileName.equals("Heart prepended to Cask")) {
@@ -102,7 +106,7 @@ public class ClosedHashingGraded {
         int farthestDrift = 0;
         String farthestWord = null;
 
-        Map<Integer, Integer> hashValueCount = new HashMap<>();
+        int[] hashValueCount = new int[hashTable.length];
 
         for (int i = 0; i < hashTable.length; i++) {
             if (hashTable[i] == null) {
@@ -123,7 +127,7 @@ public class ClosedHashingGraded {
                     farthestWord = word;
                 }
 
-                hashValueCount.put(hash, hashValueCount.getOrDefault(hash, 0) + 1);
+                hashValueCount[hash]++;
             }
         }
 
@@ -131,10 +135,10 @@ public class ClosedHashingGraded {
         longestEmpty = Math.max(longestEmpty, currentEmpty);
 
         int mostCommonHashValue = -1, maxCount = 0;
-        for (Map.Entry<Integer, Integer> entry : hashValueCount.entrySet()) {
-            if (entry.getValue() > maxCount) {
-                maxCount = entry.getValue();
-                mostCommonHashValue = entry.getKey();
+        for (int i = 0; i < hashValueCount.length; i++) {
+            if (hashValueCount[i] > maxCount) {
+                maxCount = hashValueCount[i];
+                mostCommonHashValue = i;
             }
         }
 
