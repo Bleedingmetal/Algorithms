@@ -15,33 +15,52 @@ public class ClosedHashingGraded {
 
         int[] tableSizes = {1000, 790, 991, 1499, 1499};
 
-        for (int i = 0; i < fileNames.length; i++) {
-            String fileName = fileNames[i];
-            int tableSize = tableSizes[i];
-            List<String> words;
+        Scanner scanner = new Scanner(System.in);
 
-            if (fileName.equals("Heart prepended to Cask")) {
-                words = combineFiles("TellTaleHeartB24.txt", "TheCaskOfAmontilladoB24.txt");
-            } else if (fileName.equals("Cask prepended to Heart")) {
-                words = combineFiles("TheCaskOfAmontilladoB24.txt", "TellTaleHeartB24.txt");
-            } else {
-                words = parseFile(fileName);
+        System.out.println("Which file(s) would you like to analyze?");
+        System.out.println("1. TheRavenB24.txt");
+        System.out.println("2. TellTaleHeartB24.txt");
+        System.out.println("3. TheCaskOfAmontilladoB24.txt");
+        System.out.println("4. Heart prepended to Cask");
+        System.out.println("5. Cask prepended to Heart");
+        System.out.print("Enter the numbers of the files separated by commas (e.g., 1,3,4): ");
+
+        String userInput = scanner.nextLine();
+        String[] selectedFileIndexes = userInput.split(",");
+
+        for (String index : selectedFileIndexes) {
+            int fileIndex = Integer.parseInt(index.trim()) - 1;
+            if (fileIndex >= 0 && fileIndex < fileNames.length) {
+                String fileName = fileNames[fileIndex];
+                int tableSize = tableSizes[fileIndex];
+                List<String> words;
+
+                if (fileName.equals("Heart prepended to Cask")) {
+                    words = combineFiles("TellTaleHeartB24.txt", "TheCaskOfAmontilladoB24.txt");
+                } else if (fileName.equals("Cask prepended to Heart")) {
+                    words = combineFiles("TheCaskOfAmontilladoB24.txt", "TellTaleHeartB24.txt");
+                } else {
+                    words = parseFile(fileName);
+                }
+
+                String[] hashTable = new String[tableSize];
+                Arrays.fill(hashTable, null);
+                for (String word : words) {
+                    insertIntoHashTable(hashTable, word, tableSize);
+                }
+
+                System.out.println("Hash Table for File: " + fileName);
+                displayHashTable(hashTable);
+                System.out.println();
+
+                System.out.println("Analysis for File: " + fileName);
+                analyzeHashTable(hashTable);
+                System.out.println();
             }
-
-            String[] hashTable = new String[tableSize];
-            Arrays.fill(hashTable, null);
-            for (String word : words) {
-                insertIntoHashTable(hashTable, word, tableSize);
-            }
-
-            System.out.println("Hash Table for File: " + fileName);
-            displayHashTable(hashTable);
-            System.out.println();
-
-            System.out.println("Analysis for File: " + fileName);
-            analyzeHashTable(hashTable);
-            System.out.println();
         }
+
+        analyzePart4(scanner);
+        scanner.close();
     }
 
     private static List<String> parseFile(String fileName) throws IOException {
@@ -148,5 +167,38 @@ public class ClosedHashingGraded {
         System.out.println("4. Longest cluster: " + longestCluster);
         System.out.println("5. Most common hash value: " + mostCommonHashValue + " (occurs " + maxCount + " times)");
         System.out.println("6. Farthest drift: " + farthestDrift + " (word: " + farthestWord + ")");
+    }
+
+    private static void analyzePart4(Scanner scanner) throws IOException {
+        List<String> heartToCaskWords = combineFiles("TellTaleHeartB24.txt", "TheCaskOfAmontilladoB24.txt");
+        List<String> caskToHeartWords = combineFiles("TheCaskOfAmontilladoB24.txt", "TellTaleHeartB24.txt");
+
+        String[] heartToCaskHashTable = new String[1499];
+        Arrays.fill(heartToCaskHashTable, null);
+        for (String word : heartToCaskWords) {
+            insertIntoHashTable(heartToCaskHashTable, word, 1499);
+        }
+
+        String[] caskToHeartHashTable = new String[1499];
+        Arrays.fill(caskToHeartHashTable, null);
+        for (String word : caskToHeartWords) {
+            insertIntoHashTable(caskToHeartHashTable, word, 1499);
+        }
+
+        List<String> poetNames = Arrays.asList("poe", "edgar", "allan");
+
+        System.out.println("Poet's Three Names Analysis:");
+        for (String name : poetNames) {
+            int heartToCaskIndex = computeHash(name, 1499);
+            int caskToHeartIndex = computeHash(name, 1499);
+
+            System.out.println(name + " in 'Heart prepended to Cask' hash table is at index: " + heartToCaskIndex);
+            System.out.println(name + " in 'Cask prepended to Heart' hash table is at index: " + caskToHeartIndex);
+            System.out.println();
+        }
+
+        Set<String> commonWords = new HashSet<>(heartToCaskWords);
+        commonWords.retainAll(caskToHeartWords);
+        System.out.println("Number of common words between 'Heart prepended to Cask' and 'Cask prepended to Heart': " + commonWords.size());
     }
 }
