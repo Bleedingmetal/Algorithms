@@ -33,21 +33,25 @@ public class NQueens {
 
     public static int[] findFirstSolution(int n) {
         int[] board = new int[n];
-        while (true) {
-            if (isLegalPosition(board, n)) {
-                boolean isComplete = true;
-                for (int value : board) {
-                    if (value == 0) {
-                        isComplete = false;
-                        break;
-                    }
-                }
-                if (isComplete) return board;
+        int row = 0;
+        while (row < n) {
+            board[row]++;
+            if (board[row] > n) {
+                board[row] = 0;
+                row--;
+                if (row < 0) break;
+                continue;
             }
-            board = NextLegalPosition(board, n);
-            if (isEmptyBoard(board)) break;
+            boolean legal = true;
+            for (int i = 0; i < row; i++) {
+                if (board[i] == board[row] || Math.abs(board[i] - board[row]) == Math.abs(i - row)) {
+                    legal = false;
+                    break;
+                }
+            }
+            if (legal) row++;
         }
-        return new int[n];
+        return board;
     }
 
     public static int countSolutions(int n) {
@@ -97,7 +101,8 @@ public class NQueens {
             System.out.println("Total solutions for n = " + n + ": " + solutionCount);
         }
 
-        int[] bonusCases = {32, 36};
+        int[] bonusCases = {32, 36}; // I hope this works if not pls ignore or comment out coz the runtime is like a million years
+        // it had me re-evaluate life while waiting for it to run
         for (int n : bonusCases) {
             long startTime = System.currentTimeMillis();
             int solutionCount = countSolutions(n);
