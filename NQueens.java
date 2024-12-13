@@ -18,26 +18,12 @@ public class NQueens {
 
     public static int[] NextLegalPosition(int[] board, int n) {
         int[] newBoard = board.clone();
-        int i = n - 1;
-        while (i >= 0) {
+        for (int i = n - 1; i >= 0; i--) {
             if (newBoard[i] < n) {
                 newBoard[i]++;
                 if (isLegalPosition(newBoard, n)) {
                     return newBoard;
                 }
-            }
-            newBoard[i] = 0;
-            i--;
-        }
-        return new int[n];
-    }
-
-    public static int[] Successor(int[] board, int n) {
-        int[] newBoard = board.clone();
-        for (int i = n - 1; i >= 0; i--) {
-            if (newBoard[i] < n) {
-                newBoard[i]++;
-                return newBoard;
             }
             newBoard[i] = 0;
         }
@@ -49,8 +35,8 @@ public class NQueens {
         while (true) {
             if (isLegalPosition(board, n)) {
                 boolean isComplete = true;
-                for (int value : board) {
-                    if (value == 0) {
+                for (int i = 0; i < n; i++) {
+                    if (board[i] == 0) {
                         isComplete = false;
                         break;
                     }
@@ -69,8 +55,8 @@ public class NQueens {
         while (true) {
             if (isLegalPosition(board, n)) {
                 boolean isComplete = true;
-                for (int value : board) {
-                    if (value == 0) {
+                for (int i = 0; i < n; i++) {
+                    if (board[i] == 0) {
                         isComplete = false;
                         break;
                     }
@@ -95,25 +81,22 @@ public class NQueens {
         boolean[] cols = new boolean[n];
         boolean[] leftDiagonal = new boolean[2 * n - 1];
         boolean[] rightDiagonal = new boolean[2 * n - 1];
-        return countNQueens(board, 0, cols, leftDiagonal, rightDiagonal, n);
+        return countNQueens(0, board, cols, leftDiagonal, rightDiagonal, n);
     }
 
-    private static int countNQueens(int[] board, int row, boolean[] cols, boolean[] leftDiagonal, boolean[] rightDiagonal, int n) {
-        if (row == n) {
-            return 1;
-        }
+    private static int countNQueens(int row, int[] board, boolean[] cols, boolean[] leftDiagonal, boolean[] rightDiagonal, int n) {
+        if (row == n) return 1;
+
         int count = 0;
         for (int col = 0; col < n; col++) {
             if (!cols[col] && !leftDiagonal[row - col + n - 1] && !rightDiagonal[row + col]) {
                 board[row] = col + 1;
-                cols[col] = true;
-                leftDiagonal[row - col + n - 1] = true;
-                rightDiagonal[row + col] = true;
-                count += countNQueens(board, row + 1, cols, leftDiagonal, rightDiagonal, n);
-                cols[col] = false;
-                leftDiagonal[row - col + n - 1] = false;
-                rightDiagonal[row + col] = false;
+                cols[col] = leftDiagonal[row - col + n - 1] = rightDiagonal[row + col] = true;
+
+                count += countNQueens(row + 1, board, cols, leftDiagonal, rightDiagonal, n);
+
                 board[row] = 0;
+                cols[col] = leftDiagonal[row - col + n - 1] = rightDiagonal[row + col] = false;
             }
         }
         return count;
